@@ -1,30 +1,42 @@
 #!/usr/bin/node
-const request = require('request');
-const API_URL = 'https://swapi-api.hbtn.io/api';
 
-if (process.argv.length > 2) {
-  request(`${API_URL}/films/${process.argv[2]}/`, (err, response, body) => {
-    if (err) {
-      console.error(err);
-      return;  // Stop execution if an error occurs
+const request = require('request');
+
+// Get the movie ID from command line arguments
+const movieID = process.argv[2];
+
+// Define the URL for the Star Wars API film endpoint with the movie ID
+const url = `https://swapi.dev/api/films/${movieID}/`;
+
+// Request the film data
+request(url, (error, response, body) => {
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  // Parse the response body
+  const filmData = JSON.parse(body);
+  const characters = filmData.characters;
+
+  // Function to fetch and print character names in order
+  const printCharacter = (index) => {
+    if (index >= characters.length) {
+      return;
     }
 
-    const charactersURL = JSON.parse(body).characters;
-    const characterPromises = charactersURL.map(
-      (url) =>
-        new Promise((resolve, reject) => {
-          request(url, (promiseErr, res, charactersReqBody) => {
-            if (promiseErr) {
-              reject(promiseErr);
-            } else {
-              resolve(JSON.parse(charactersReqBody).name);
-            }
-          });
-        })
-    );
+    request(characters[index], (err, res, charBody) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
 
-    Promise.all(characterPromises)
-      .then((names) => console.log(names.join('\n')))
-      .catch((allErr) => console.error(allErr));
-  });
-}
+      const charData = JSON.parse(charBody);
+      console.log(charData.name);
+      printCharacter(index + 1);
+    });
+  };
+
+  // Start printing characters
+  printCharacter(0);
+});
