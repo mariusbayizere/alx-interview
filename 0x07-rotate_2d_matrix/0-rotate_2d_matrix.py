@@ -13,12 +13,12 @@ def rotate_2d_matrix(matrix) -> None:
     """
     matrix.reverse()
 
-    for row in range(len(matrix)):
-        for column in range(len(matrix)):
-            if row < column:
-                matrix[row][column], matrix[column][row] = (
-                    matrix[column][row],
-                    matrix[row][column],
+    for xx in range(len(matrix)):
+        for yy in range(len(matrix)):
+            if xx < yy:
+                matrix[xx][yy], matrix[yy][xx] = (
+                    matrix[yy][xx],
+                    matrix[xx][yy],
                 )
 
 
